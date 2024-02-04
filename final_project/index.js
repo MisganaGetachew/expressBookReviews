@@ -13,11 +13,22 @@ app.use("/customer",session({secret:"fingerprint_customer",resave: true, saveUni
 
 app.use("/customer/auth/*", function auth(req,res,next){
 //Write the authenication mechanism here
-
-
+if(req.session.authorization){
+    let token = req.session.authorization["accesToken"]
+    jwt.verify(token, "accessKey", function(err, user) {
+        if(!err){
+            req.user = user
+            next()
+        }
+        else{
+            res.status(401).json({message: "Unauthorized"})
+        }
+    
+})
+}
 
 });
-// console.log("checking abj")
+
 
  
 const PORT =5000;
