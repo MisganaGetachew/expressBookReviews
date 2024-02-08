@@ -53,7 +53,7 @@ regd_users.post("/login", (req,res) => {
 
         req.session.authorization = {accesToken, username}
      
-  return res.status(200).send("User successfully logged in");
+  return res.status(200).send("User successfully logged in" );
     }
     else{
       return res.status(208).json({message: "Invalid Login. Check username and password"});
@@ -66,11 +66,76 @@ regd_users.post("/login", (req,res) => {
 
 });
 
+
+regd_users.get("/review", (req, res)=>{
+
+  console.log(req.session.authorization.username)
+  return res.status(300).json({message: req.session.authorization.username })
+})
+
 // Add a book review
+
 regd_users.put("/auth/review/:isbn", (req, res) => {
-  //Write your code here
-  return res.status(300).json({message: "Yet to be implemented"});
-});
+    if (req.session.authorization) {
+      const isbn = req.params.isbn;
+      const review = req.query.review;
+      const username = req.session.authorization["username"];
+  
+      for (let bookId in books) {
+        if (bookId == isbn) { // Use == for loose equality
+          let book = books[bookId];
+  
+          if (!book.reviews) {
+            book.reviews = {};
+          }
+  
+          if (book.reviews[username]) {
+            book.reviews[username] += review;
+            return res.status(200).json({ message: "Review updated successfully" });
+          } else {
+            book.reviews[username] = review;
+            return res.status(200).json({ message: "Review added successfully" });
+          }
+        }
+      }
+  
+      // If the loop completes without finding the book
+      return res.status(404).json({ message: "Book not found" });
+    } else {
+      return res.status(401).json({ message: "You need to login for adding review" });
+    }
+  });
+  
+
+
+
+
+
+regd_users.delete("/auth/review/:isbn", (req, res) => {
+    const isbn = req.params.isbn;
+    const username = req.session.authorization["username"];
+  
+    for (let bookId in books) {
+      if (bookId == isbn) {
+        let book = books[bookId];
+  
+        if (book.reviews) {
+          if (book.reviews[username]) {
+            delete book.reviews[username];
+            return res.status(200).json({ message: "Review deleted successfully" });
+          } else {
+            return res.status(404).json({ message: "Review not found" });
+          }
+        } else {
+          return res.status(404).json({ message: "Review not found" });
+        }
+      }
+    }
+  
+    // If the loop completes without finding the book
+    return res.status(404).json({ message: "Book not found" });
+  });
+  
 
 module.exports.authenticated = regd_users;
 module.exports.isValid = isValid;

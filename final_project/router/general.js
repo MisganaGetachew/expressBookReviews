@@ -1,4 +1,5 @@
 const express = require('express');
+// const bodyParser = require('body-parser');
 let books = require("./booksdb.js");
 let isValid = require("./auth_users.js").isValid;
 let users = require("./auth_users.js").users;
@@ -7,8 +8,8 @@ const public_users = express.Router();
 
 public_users.post("/register", (req,res) => {
   //Write your code here
-let username = req.query.username
-let password = req.query.password
+let username = req.body.username
+let password = req.body.password
 
 if(username && password ){
   if(isValid(username)){
@@ -107,7 +108,7 @@ public_users.get('/title/:title',function (req, res) {
     if(found == false){
 
       
-      return res.status(300).json({message: `books with titiel :  ${title}  do not exist`});
+      return res.status(300).json({message: `books with title:  ${title}  do not exist`});
   }
     
   }
@@ -122,7 +123,22 @@ else{
 //  Get book review
 public_users.get('/review/:isbn',function (req, res) {
   //Write your code here
-  return res.status(300).json({message: "Yet to be implemented"});
+  const isbn = req.params.isbn;
+  let found = false;
+  if(isbn){
+    for(let bookId in books){
+      if(bookId == isbn){
+      let book = books[bookId];
+        return res.status(300).json({bookReview: JSON.stringify(book.reviews)});
+      }
+     
+    }
+    if(found == false){
+      
+    return res.status(300).json({message: `book with isbn :  ${isbn}  do not exist`});
+    }
+  }
+  return res.status(300).json({message: "please enter a valid isbn"});
 });
 
 
