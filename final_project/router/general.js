@@ -6,12 +6,6 @@ let users = require("./auth_users.js").users;
 const public_users = express.Router();
 const axios = require('axios')
 
-
-
-
-
-
-
 public_users.post("/register", (req,res) => {
   //Write your code here
 let username = req.body.username
@@ -23,7 +17,7 @@ if(username && password ){
   }
   else{
     users.push({"username": username, "password" : password})
-   return res.status(300).json({message: "user succesfully registerd!"});
+   return res.status(200).json({message: "user succesfully registerd!"});
 
 
   }
@@ -56,7 +50,6 @@ public_users.get('/async', async function (req, res) {
      
   }
 });
-
 
 
 // Get book details based on ISBN
@@ -226,16 +219,16 @@ public_users.get('/review/:isbn',function (req, res) {
     for(let bookId in books){
       if(bookId == isbn){
       let book = books[bookId];
-        return res.status(300).json({bookReview: JSON.stringify(book.reviews)});
+        return res.status(200).json({bookReview: JSON.stringify(book.reviews)});
       }
      
     }
     if(found == false){
       
-    return res.status(300).json({message: `book with isbn :  ${isbn}  do not exist`});
+    return res.status(404).json({message: `book with isbn :  ${isbn}  do not exist`});
     }
   }
-  return res.status(300).json({message: "please enter a valid isbn"});
+  return res.status(404).json({message: "please enter a valid isbn"});
 });
 
 

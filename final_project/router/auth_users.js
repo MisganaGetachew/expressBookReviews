@@ -42,7 +42,7 @@ regd_users.post("/login", (req,res) => {
   //Write your code here
 
   if (!username || !password) {
-    return res.status(404).json({message: "Error logging in"});
+    return res.status(500).json({message: "Error logging in"});
 }
   if(isValid(username)){
 
